@@ -4,13 +4,13 @@ import sbtassembly.Plugin.AssemblyKeys._
 
 assemblySettings
 
-jarName in assembly := "DetailingService.jar"
+jarName in assembly := "CarRepairService.jar"
 
 test in assembly := {}
 
 organization := "com.bobwilsonsgarage"
 
-name := "akka-cluster-detailingservice"
+name := "akka-cluster-carrepairservice"
 
 version := "1.0"
 

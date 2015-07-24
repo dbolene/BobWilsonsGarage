@@ -1,21 +1,21 @@
-package com.bobwilsonsgarage.staffing
+package com.bobwilsonsgarage.detailing
 
 import akka.actor.ActorSystem
 import akka.contrib.pattern.ClusterSingletonProxy
-import com.bobwilsonsgarage.staffing.StaffingServiceEndpointOverseerProtocol.CreateStaffingServiceEndpoint
+import com.bobwilsonsgarage.detailing.DetailingServiceEndpointOverseerProtocol.CreateDetailingServiceEndpoint
 import com.typesafe.config.ConfigFactory
 
 /**
- * Staffing Service Hosting Akka Cluster Node.
+ * Detailing Service Hosting Akka Cluster Node.
  
  * @author dbolene
  */
-object StaffingServiceNode {
+object DetailingServiceNode {
   def main(args: Array[String]): Unit = {
     // Override the configuration of the port when specified as program argument
     val port = if (args.isEmpty) "0" else args(0)
     val config = ConfigFactory.parseString(s"akka.remote.netty.tcp.port=$port").
-      withFallback(ConfigFactory.parseString("akka.cluster.roles = [staffingservice]")).
+      withFallback(ConfigFactory.parseString("akka.cluster.roles = [detailingservice]")).
       withFallback(ConfigFactory.load())
 
     val system = ActorSystem("ClusterSystem", config)
@@ -25,8 +25,8 @@ object StaffingServiceNode {
       role = None),
       name = "registryProxy")
 
-    val staffingServiceEndpointOverseer = system.actorOf(StaffingServiceEndpointOverseer.props())
+    val staffingServiceEndpointOverseer = system.actorOf(DetailingServiceEndpointOverseer.props())
 
-    staffingServiceEndpointOverseer ! CreateStaffingServiceEndpoint(registry = registry)
+    staffingServiceEndpointOverseer ! CreateDetailingServiceEndpoint(registry = registry)
   }
 }

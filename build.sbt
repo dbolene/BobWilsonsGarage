@@ -20,9 +20,9 @@ lazy val staffing = Project(id = "staffing",
                             base = file("staffing"))
                             .dependsOn(common)
 
-//lazy val carRepair = Project(id = "carRepair",
-//                            base = file("carRepair"))
-//                            .dependsOn(common)
+lazy val carRepair = Project(id = "carRepair",
+                            base = file("carRepair"))
+                            .dependsOn(common)
 
 lazy val detailing = Project(id = "detailing",
                             base = file("detailing"))
@@ -30,5 +30,5 @@ lazy val detailing = Project(id = "detailing",
 
 lazy val root = Project(id = "root",
                             base = file("."))
-                            .aggregate(common, staffing, detailing)
+                            .aggregate(common, staffing, detailing, carRepair)
 //                            .aggregate(common, frontEnd, staffing, carRepair, detailing)
