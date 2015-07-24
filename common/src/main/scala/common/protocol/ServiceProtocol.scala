@@ -2,7 +2,7 @@ package common.protocol
 
 /**
  * Generic Service Interaction Protocol.
- * 
+ *
  * @author dbolene
  */
 object ServiceProtocol {

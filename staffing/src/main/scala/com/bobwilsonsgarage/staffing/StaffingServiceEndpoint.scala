@@ -1,7 +1,7 @@
 package com.bobwilsonsgarage.staffing
 
 import akka.actor.{ActorRef, ActorLogging, Actor, Props}
-import com.bobwilsonsgarage.staffing.CloudServiceEndpointInternalProtocol.InitializeStaffingServiceEndpoint
+import com.bobwilsonsgarage.staffing.StaffingServiceEndpointInternalProtocol.InitializeStaffingServiceEndpoint
 import com.comcast.csv.common.protocol.ServiceRegistryProtocol.{RegistryHasRestarted, PublishService}
 import common.protocol.StaffingService
 import common.protocol.StaffingServiceProtocol._
@@ -41,7 +41,7 @@ class StaffingServiceEndpoint extends Actor with ActorLogging {
   }
 }
 
-object CloudServiceEndpointInternalProtocol {
+object StaffingServiceEndpointInternalProtocol {
 
   case class InitializeStaffingServiceEndpoint(registry: ActorRef)
 

@@ -2,9 +2,8 @@ package com.bobwilsonsgarage.staffing
 
 import akka.actor.SupervisorStrategy.{Restart, Stop}
 import akka.actor._
-import com.bobwilsonsgarage.staffing.CloudServiceEndpointInternalProtocol.InitializeStaffingServiceEndpoint
+import com.bobwilsonsgarage.staffing.StaffingServiceEndpointInternalProtocol.InitializeStaffingServiceEndpoint
 import common.protocol.StaffingService
-import common.protocol.StaffingServiceProtocol._
 
 import scala.concurrent.duration._
 

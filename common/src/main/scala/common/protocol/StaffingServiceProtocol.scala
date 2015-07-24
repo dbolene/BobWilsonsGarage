@@ -8,6 +8,7 @@ package common.protocol
 object StaffingServiceProtocol {
 
   case class StaffingRequest(requestedStaff: Int)
+  case class StaffingResponse(staffProvided: Int)
 
 }
 
