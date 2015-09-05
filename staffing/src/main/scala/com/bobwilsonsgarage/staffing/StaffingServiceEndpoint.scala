@@ -35,6 +35,8 @@ class StaffingServiceEndpoint extends Actor with ActorLogging {
       registry.foreach(r => r ! PublishService(serviceName = StaffingService.endpointName, serviceEndpoint = self))
 
     case sr: StaffingRequest =>
+      // when we are open, we got all kinds of people sitting around
+      sender() ! StaffingResponse(sr.requestedStaff)
 
     case msg =>
       log.info(s"received unknown message: $msg")

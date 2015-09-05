@@ -25,8 +25,8 @@ object DetailingServiceNode {
       role = None),
       name = "registryProxy")
 
-    val staffingServiceEndpointOverseer = system.actorOf(DetailingServiceEndpointOverseer.props())
+    val detailingServiceEndpointOverseer = system.actorOf(DetailingServiceEndpointOverseer.props())
 
-    staffingServiceEndpointOverseer ! CreateDetailingServiceEndpoint(registry = registry)
+    detailingServiceEndpointOverseer ! CreateDetailingServiceEndpoint(registry = registry)
   }
 }

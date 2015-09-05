@@ -7,8 +7,9 @@ package common.protocol
  */
 object CarRepairServiceProtocol {
 
-  case class CarRepairRequest(car: String, detailYN: Boolean)
-  case class CarRepairFinished(car: String, detailedYN: Boolean, detailedReason: Option[String])
+  case class CarRepairRequest(car: String)
+  case class CarRepairFinished(car: String)
+  case class CarCouldNotBeRepaired(car: String, reason: Option[String] = None)
 
 }
 

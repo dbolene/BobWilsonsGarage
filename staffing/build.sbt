@@ -10,7 +10,7 @@ test in assembly := {}
 
 organization := "com.bobwilsonsgarage"
 
-name := "akka-cluster-staffingservice"
+name := "bob-wilsons-staffingservice"
 
 version := "1.0"
 
@@ -19,8 +19,6 @@ scalaVersion := "2.11.6"
 val akkaVersion = "2.3.11"
 
 val sprayVersion = "1.3.3"
-
-seq(Revolver.settings: _*)
 
 resolvers ++= Seq(
   "Typesafe repo" at "http://repo.typesafe.com/typesafe/releases/",
@@ -31,20 +29,6 @@ resolvers ++= Seq(
 libraryDependencies += "junit" % "junit" % "4.5" % "test"
 
 libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.1.5" % "test"
-
-val slf4jOrg = "org.slf4j"
-
-val slf4jVersion = "1.7.10"
-
-libraryDependencies +=  slf4jOrg % "slf4j-api" % slf4jVersion
-
-libraryDependencies +=  slf4jOrg % "log4j-over-slf4j" % slf4jVersion
-
-libraryDependencies +=  slf4jOrg % "jcl-over-slf4j" % slf4jVersion % "test"
-
-libraryDependencies +=  slf4jOrg % "jul-to-slf4j" % slf4jVersion % "test"
-
-libraryDependencies +=  slf4jOrg % "slf4j-simple" % slf4jVersion
 
 libraryDependencies += "com.typesafe.akka" % "akka-actor_2.11" % akkaVersion
 

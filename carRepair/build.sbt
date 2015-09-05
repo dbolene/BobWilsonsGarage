@@ -10,7 +10,7 @@ test in assembly := {}
 
 organization := "com.bobwilsonsgarage"
 
-name := "akka-cluster-carrepairservice"
+name := "bob-wilsons-carrepairservice"
 
 version := "1.0"
 
@@ -19,8 +19,6 @@ scalaVersion := "2.11.6"
 val akkaVersion = "2.3.11"
 
 val sprayVersion = "1.3.3"
-
-seq(Revolver.settings: _*)
 
 resolvers ++= Seq(
   "Typesafe repo" at "http://repo.typesafe.com/typesafe/releases/",
