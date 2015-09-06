@@ -163,6 +163,7 @@ class FulfillmentProcess extends PersistentActor with PersistentStateMachine wit
         log.info(s"Received -> CarRepairFinished")
 
         update(FulfillmentProcessData(
+          carServiceResponse = Option(finished),
           newState = Option(PersistentStateMachineStateRef(DetailingCar))
         ))
 
@@ -174,6 +175,7 @@ class FulfillmentProcess extends PersistentActor with PersistentStateMachine wit
         log.info(s"Received -> CarCouldNotBeRepaired")
 
         update(FulfillmentProcessData(
+          carServiceResponse = Option(notRepaired),
           newState = Option(PersistentStateMachineStateRef(ServiceUnavailable))
         ))
 
@@ -192,6 +194,7 @@ class FulfillmentProcess extends PersistentActor with PersistentStateMachine wit
         log.info(s"Received => DetailingFinished")
 
         update(FulfillmentProcessData(
+          detailingResponse = Option(detailingFinished),
           newState = Option(PersistentStateMachineStateRef(Fulfilled))
         ))
 
@@ -199,6 +202,7 @@ class FulfillmentProcess extends PersistentActor with PersistentStateMachine wit
         log.info(s"Received => CarCouldNotBeDetailed")
 
         update(FulfillmentProcessData(
+          detailingResponse = Option(notDetailed),
           newState = Option(PersistentStateMachineStateRef(Fulfilled))
         ))
 
