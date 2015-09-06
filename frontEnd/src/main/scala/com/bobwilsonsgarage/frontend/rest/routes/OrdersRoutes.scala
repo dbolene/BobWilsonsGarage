@@ -4,10 +4,11 @@ import akka.actor.ActorRef
 import akka.contrib.pattern.ClusterSharding
 import akka.pattern.ask
 import akka.util.Timeout
+import com.bobwilsonsgarage.frontend.resources.BobWilsonsGarageServiceRestProtocol
 import com.bobwilsonsgarage.frontend.rest.{HostAndPath, RestApiServiceActor}
 import com.bobwilsonsgarage.frontend.server.ServerFrontendProtocol.{DependentServices, RequestDependentServices}
 import com.bobwilsonsgarage.frontend.util.{UrlEstablisher, UuidUtil}
-import common.protocol.BobWilsonsGarageProtocol.BobWilsonsGarageServiceRequest
+import common.protocol.BobWilsonsGarageProtocol.{BobWilsonsGarageServiceResult, GetBobWilsonsGarageServiceResult, BobWilsonsGarageServiceRequest}
 import common.protocol.FulfillmentProcessProtocol.InitiateFulfillmentProcess
 import common.protocol.ShardingProtocol.EntryEnvelope
 import common.shardingfunctions.FulfillmentProcessShardingFunctions
@@ -48,16 +49,11 @@ trait OrdersRoutes extends HttpService with Logging {
       entity(as[BobWilsonsGarageServiceRequestPost]) {
         bobWilsonsGarageServicePostRequest => {
           ctx =>
-            info(ctx.request.method + " - " + ctx.request.uri)
-            info(s"service request POST payload: $bobWilsonsGarageServicePostRequest")
-
             (dependenciesResolver ? RequestDependentServices).mapTo[DependentServices] onComplete {
 
               case Failure(e) =>
                 ctx.complete(e)
               case Success(dependentServicesResponse) =>
-
-                info(s"dependentServicesResponse: $dependentServicesResponse")
 
                 val fulfillmentProcessId = UuidUtil.generateNewUuid()
 
@@ -75,5 +71,20 @@ trait OrdersRoutes extends HttpService with Logging {
         }
       }
     }
+  }
+
+  lazy val ordersIdRoute = {
+    orderId: String =>
+      info("uh-------------------")
+      get {
+        ctx =>
+          (fulfillmentProcessRegion ? EntryEnvelope(orderId, GetBobWilsonsGarageServiceResult)).mapTo[BobWilsonsGarageServiceResult] onComplete {
+            case Failure(e) =>
+              ctx.complete(e)
+            case Success(bobWilsonsGarageServiceResult) =>
+              val result = BobWilsonsGarageServiceRestProtocol.mapFromBobWilsonsGarageServiceResult(bobWilsonsGarageServiceResult)
+              ctx.complete(result)
+          }
+      }
   }
 }

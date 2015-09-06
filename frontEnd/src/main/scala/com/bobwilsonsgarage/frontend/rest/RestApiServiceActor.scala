@@ -1,8 +1,8 @@
 package com.bobwilsonsgarage.frontend.rest
 
-import akka.actor.{Props, ActorRef, Actor}
+import akka.actor.{Actor, ActorRef, Props}
 import com.bobwilsonsgarage.frontend.rest.routes.OrdersRoutes
-import spray.routing.HttpService
+import spray.routing.{HttpService, PathMatchers}
 
 object RestApiServiceActor {
   def props(serverFrontEnd: ActorRef) = Props(new RestApiServiceActor(serverFrontEnd))
@@ -22,10 +22,8 @@ class RestApiServiceActor(serverFrontEnd: ActorRef) extends Actor with HttpServi
 
   lazy val bobWilsonsGarageService = {
     pathPrefix("BobWilsonsGarage") {
-      //      path("") { rootRoute } ~
-      path("orders") {
-        ordersRoute
-      }
+      path("orders") {ordersRoute} ~
+      path("orders" / PathMatchers.Segment) {ordersIdRoute}
     }
   }
 }
