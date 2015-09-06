@@ -7,11 +7,16 @@ package common.protocol
  */
 object BobWilsonsGarageProtocol {
 
-  case class RequestService(car: String)
-  case class ServiceResponse(car: String,
-                             repairedYN: Boolean,
-                             notRepairedReason: Option[String] = None,
-                             detailedYN: Boolean,
-                             notDetailedReason: Option[String])
+  case class BobWilsonsGarageServiceRequest(car: Option[String])
+
+  case object GetBobWilsonsGarageServiceResult
+
+  case class BobWilsonsGarageServiceResult(orderId: Option[String],
+                                           car: Option[String],
+                                           repairedYN: Boolean = false,
+                                           notRepairedReason: Option[String] = None,
+                                           detailedYN: Boolean = false,
+                                           notDetailedReason: Option[String] = None,
+                                           state: Option[String] = None)
 
 }

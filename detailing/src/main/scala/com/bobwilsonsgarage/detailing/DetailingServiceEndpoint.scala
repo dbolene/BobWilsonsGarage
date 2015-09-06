@@ -75,7 +75,7 @@ class DetailingServiceEndpoint extends LoggingFSM[State, Data] with ActorLogging
           if (sr.staffProvided >= 1)
             requestor ! DetailingFinished(detailingRequest.car)
           else
-            requestor ! CarCouldNotBeDetailed(detailingRequest.car, Some("no staff available"))
+            requestor ! CarCouldNotBeDetailed(detailingRequest.car, reason = Some("no staff available"))
         case _ =>
           requestor ! CarCouldNotBeDetailed(detailingRequest.car)
       })

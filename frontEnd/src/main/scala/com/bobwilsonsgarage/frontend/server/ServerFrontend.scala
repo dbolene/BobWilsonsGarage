@@ -1,11 +1,20 @@
 package com.bobwilsonsgarage.frontend.server
 
 import akka.actor._
-import akka.cluster.Cluster
-import akka.cluster.ClusterEvent.MemberUp
-import common.protocol.ClusterNodeRegistrationProtocol.BackendRegistration
+import akka.cluster.{MemberStatus, Cluster}
+import akka.cluster.ClusterEvent.{CurrentClusterState, MemberUp}
+import akka.contrib.pattern.{ClusterSingletonManager, ClusterSingletonProxy}
+import akka.io.IO
+import com.bobwilsonsgarage.frontend.rest.RestApiServiceActor
+import com.bobwilsonsgarage.frontend.server.ServerFrontendProtocol.{DependentServices, RequestDependentServices}
+import com.comcast.csv.akka.serviceregistry.ServiceRegistry
+import com.comcast.csv.akka.serviceregistry.ServiceRegistryInternalProtocol.End
+import com.comcast.csv.common.protocol.ServiceRegistryProtocol.{ServiceAvailable, ServiceUnAvailable, SubscribeToService}
 import com.typesafe.config.ConfigFactory
+import common.protocol.ClusterNodeRegistrationProtocol.BackendRegistration
+import common.protocol.{CarRepairService, DetailingService}
 import common.util.Logging
+import spray.can.Http
 
 /**
  * FrontEnd Server main.
@@ -14,18 +23,22 @@ import common.util.Logging
  */
 object ServerFrontend extends Logging {
 
-  def runMe(sys: ActorSystem): Unit = {
+  var sys: ActorSystem = null
+  val restPort = 8080
+  val restScheme = "http"
 
-/*    sys.actorOf(ClusterSingletonManager.props(
+  def runMe(): Unit = {
+
+    info("ServerFrontend runMe")
+
+    sys.actorOf(ClusterSingletonManager.props(
       singletonProps = ServiceRegistry.props,
       singletonName = "registry",
       terminationMessage = End,
       role = None),
       name = "singleton")
-*/
-    val frontend = sys.actorOf(Props[ServerFrontend], name = "frontend")
 
-    info("ServerFrontend runMe")
+    val frontend = sys.actorOf(Props[ServerFrontend], name = "frontend")
 
   }
 
@@ -38,9 +51,9 @@ object ServerFrontend extends Logging {
 
     val portArg = if (args.isEmpty) "0" else args(0)
 
-    val system = ActorSystem("ClusterSystem", config)
+    sys = ActorSystem("ClusterSystem", config)
 
-    runMe(system)
+    runMe()
 
   }
 }
@@ -48,11 +61,32 @@ object ServerFrontend extends Logging {
 class ServerFrontend extends Actor with Logging {
 
   val cluster = Cluster(context.system)
+  var carRepairServiceEndpoint: Option[ActorRef] = None
+  var detailingServiceEndpoint: Option[ActorRef] = None
 
   // subscribe to cluster changes, MemberUp
   // re-subscribe when restart
   override def preStart(): Unit = cluster.subscribe(self, classOf[MemberUp])
+
   override def postStop(): Unit = cluster.unsubscribe(self)
+
+  val handler = context.actorOf(RestApiServiceActor.props(self), name = "bobwilsonsgarage-rest-service")
+
+  implicit val sys = context.system
+
+  IO(Http) ! Http.Bind(handler, interface = "0.0.0.0", port = ServerFrontend.restPort)
+
+  // finally we drop the main thread but hook the shutdown of
+  // our IOBridge into the shutdown of the applications ActorSystem
+  context.system.registerOnTermination {
+    Http.Unbind
+    info("Exiting...")
+  }
+
+  val registry = context.system.actorOf(ClusterSingletonProxy.props(
+    singletonPath = "/user/singleton/registry",
+    role = None),
+    name = "registryProxy")
 
   var backends = IndexedSeq.empty[ActorRef]
 
@@ -60,9 +94,52 @@ class ServerFrontend extends Actor with Logging {
     case BackendRegistration if !backends.contains(sender()) =>
       info(s"Received -> BackendRegistration")
       context watch sender()
+      if (backends.isEmpty) {
+        registry ! SubscribeToService(serviceName = CarRepairService.endpointName)
+        registry ! SubscribeToService(serviceName = DetailingService.endpointName)
+      }
       backends = backends :+ sender()
+
     case Terminated(a) =>
       info(s"Received -> Terminated($a)")
       backends = backends.filterNot(_ == a)
+
+    case serviceAvailable: ServiceAvailable if serviceAvailable.serviceName == CarRepairService.endpointName =>
+      info(s"Received -> ServiceAvailable: ${serviceAvailable.serviceName}")
+      carRepairServiceEndpoint = Option(serviceAvailable.serviceEndpoint)
+
+    case serviceUnAvailable: ServiceUnAvailable if serviceUnAvailable.serviceName == CarRepairService.endpointName =>
+      info(s"Received -> ServiceUnAvailable: ${serviceUnAvailable.serviceName}")
+      carRepairServiceEndpoint = None
+
+    case serviceAvailable: ServiceAvailable if serviceAvailable.serviceName == DetailingService.endpointName =>
+      info(s"Received -> ServiceAvailable: ${serviceAvailable.serviceName}")
+      detailingServiceEndpoint = Option(serviceAvailable.serviceEndpoint)
+
+    case serviceUnAvailable: ServiceUnAvailable if serviceUnAvailable.serviceName == DetailingService.endpointName =>
+      info(s"Received -> ServiceUnAvailable: ${serviceUnAvailable.serviceName}")
+      detailingServiceEndpoint = None
+
+    case RequestDependentServices =>
+      info(s"Received -> RequestDependentServices")
+      sender() ! DependentServices(carRepairServiceEndpoint, detailingServiceEndpoint)
+
+    case state: CurrentClusterState =>
+      state.members
+    case MemberUp(m) =>
+      info(s"======= backend MemberUp")
+    case unknown =>
+      warn(s"Received unknown message: $unknown")
+
   }
+}
+
+object ServerFrontendProtocol {
+
+  case object RequestDependentServices
+
+  case class DependentServices(
+                                carRepairServiceEndpoint: Option[ActorRef] = None,
+                                detailingServiceEndpoint: Option[ActorRef] = None
+                                )
 }

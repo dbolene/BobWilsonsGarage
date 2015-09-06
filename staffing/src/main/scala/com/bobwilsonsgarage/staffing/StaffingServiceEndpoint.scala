@@ -27,14 +27,17 @@ class StaffingServiceEndpoint extends Actor with ActorLogging {
   override def receive = {
 
     case initialize: InitializeStaffingServiceEndpoint =>
+      log.info(s"Received -> InitializeStaffingServiceEndpoint")
       registry = Option(initialize.registry)
       registry.foreach(r => r ! PublishService(serviceName = StaffingService.endpointName, serviceEndpoint = self))
 
     case registryHasRestarted: RegistryHasRestarted =>
+      log.info(s"Received -> RegistryHasRestarted")
       registry = Option(registryHasRestarted.registry)
       registry.foreach(r => r ! PublishService(serviceName = StaffingService.endpointName, serviceEndpoint = self))
 
     case sr: StaffingRequest =>
+      log.info(s"Received -> StaffingRequest")
       // when we are open, we got all kinds of people sitting around
       sender() ! StaffingResponse(sr.requestedStaff)
 

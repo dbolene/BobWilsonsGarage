@@ -7,9 +7,15 @@ package common.protocol
  */
 object DetailingServiceProtocol {
 
-  case class DetailingRequest(car: String)
-  case class DetailingFinished(car: String)
-  case class CarCouldNotBeDetailed(car: String, reason: Option[String] = None)
+  trait DetailingResponse {
+    def car: Option[String]
+    def detailedYN: Boolean
+    def reason: Option[String]
+  }
+
+  case class DetailingRequest(car: Option[String])
+  case class DetailingFinished(car: Option[String], detailedYN: Boolean = true, reason: Option[String] = None) extends DetailingResponse
+  case class CarCouldNotBeDetailed(car: Option[String], detailedYN: Boolean = false, reason: Option[String] = None) extends DetailingResponse
 
 }
 
