@@ -75,7 +75,6 @@ trait OrdersRoutes extends HttpService with Logging {
 
   lazy val ordersIdRoute = {
     orderId: String =>
-      info("uh-------------------")
       get {
         ctx =>
           (fulfillmentProcessRegion ? EntryEnvelope(orderId, GetBobWilsonsGarageServiceResult)).mapTo[BobWilsonsGarageServiceResult] onComplete {
