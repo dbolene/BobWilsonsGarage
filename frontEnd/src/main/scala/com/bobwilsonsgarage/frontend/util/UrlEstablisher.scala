@@ -7,7 +7,7 @@ package com.bobwilsonsgarage.frontend.util
  */
 object UrlEstablisher {
   def encode(basePath: String, uniquePath: String) = {
-    s"$basePath/$uniquePath"
+    s"http://$basePath$uniquePath"
   }
 
   def orderUrl(orderId: String, hostAndPath: String) =

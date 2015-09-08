@@ -27,9 +27,9 @@ class CarRepairServiceEndpointOverseer extends Actor with ActorLogging {
 
     case csse: CreateCarRepairServiceEndpoint =>
       try {
-        val staffingServiceActor = context.actorOf(CarRepairServiceEndpoint.props, CarRepairService.endpointName)
-        staffingServiceActor ! InitializeCarRepairServiceEndpoint(csse.registry)
-        sender() ! CarRepairServiceEndpointCreated(staffingServiceActor)
+        val carRepairServiceActor = context.actorOf(CarRepairServiceEndpoint.props, CarRepairService.endpointName)
+        carRepairServiceActor ! InitializeCarRepairServiceEndpoint(csse.registry)
+        sender() ! CarRepairServiceEndpointCreated(carRepairServiceActor)
       } catch {
         case ex: InvalidActorNameException =>
           sender () ! CarRepairServiceEndpointCreateFailed
