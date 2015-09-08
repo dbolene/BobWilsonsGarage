@@ -164,7 +164,9 @@ class FulfillmentProcess extends PersistentActor with PersistentStateMachine wit
 
         update(FulfillmentProcessData(
           carServiceResponse = Option(finished),
-          newState = Option(PersistentStateMachineStateRef(DetailingCar))
+          newState = data.detailingServiceEndpoint
+            .map(dse => PersistentStateMachineStateRef(DetailingCar))
+            .orElse(Some(PersistentStateMachineStateRef(Fulfilled)))
         ))
 
         // edge action
