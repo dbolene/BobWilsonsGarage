@@ -188,9 +188,10 @@ Try to POST again, rinse, repeat, experiment.
 <a name="resources">
 Resources
 --------
+</a>
 
 Akka Service Registry Repo: [https://github.com/Comcast/ActorServiceRegistry](https://github.com/Comcast/ActorServiceRegistry "The Akka Service Registry Repo")
 
 
 SOA on Steroids presentation: TBD
-</a>
+
