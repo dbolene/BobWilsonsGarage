@@ -16,7 +16,6 @@ object BobWilsonsGarageServiceRestProtocol {
 
   object BobWilsonsGarageServiceRequestPost extends DefaultJsonProtocol {
     implicit val format = jsonFormat1(BobWilsonsGarageServiceRequestPost.apply)
-
   }
 
   case class BobWilsonsGarageServiceGetResponse(orderId: Option[String],
@@ -29,7 +28,6 @@ object BobWilsonsGarageServiceRestProtocol {
 
   object BobWilsonsGarageServiceGetResponse extends DefaultJsonProtocol {
     implicit val format = jsonFormat7(BobWilsonsGarageServiceGetResponse.apply)
-
   }
 
   def mapFromBobWilsonsGarageServiceResult(result: BobWilsonsGarageServiceResult) = {
