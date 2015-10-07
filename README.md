@@ -192,6 +192,5 @@ Resources
 
 Akka Service Registry Repo: [https://github.com/Comcast/ActorServiceRegistry](https://github.com/Comcast/ActorServiceRegistry "The Akka Service Registry Repo")
 
-
-SOA on Steroids presentation: TBD
+SOA on Steroids presentation: [http://www.slideshare.net/dbolene/soa-on-steroids](http://www.slideshare.net/dbolene/soa-on-steroids "SOA On Steroids")
 
