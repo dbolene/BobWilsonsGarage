@@ -7,8 +7,6 @@ Table of Contents
  * [Usage](#usage)
  * [Resources](#resources)
 
-(WARNING: You can't build this thing until the Actor Service Registry for Akka is available on MavenCentral.  We'll have it available shortly)
-
 <a name="what">
 What is it?
 --------
