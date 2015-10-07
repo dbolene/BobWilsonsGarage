@@ -25,8 +25,8 @@ object CarRepairServiceNode {
       role = None),
       name = "registryProxy")
 
-    val staffingServiceEndpointOverseer = system.actorOf(CarRepairServiceEndpointOverseer.props())
+    val carRepairServiceEndpointOverseer = system.actorOf(CarRepairServiceEndpointOverseer.props())
 
-    staffingServiceEndpointOverseer ! CreateCarRepairServiceEndpoint(registry = registry)
+    carRepairServiceEndpointOverseer ! CreateCarRepairServiceEndpoint(registry = registry)
   }
 }
