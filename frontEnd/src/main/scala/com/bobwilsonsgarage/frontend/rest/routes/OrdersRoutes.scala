@@ -1,14 +1,13 @@
 package com.bobwilsonsgarage.frontend.rest.routes
 
-import akka.actor.ActorRef
-import akka.contrib.pattern.ClusterSharding
+import akka.cluster.sharding.ClusterSharding
 import akka.pattern.ask
 import akka.util.Timeout
 import com.bobwilsonsgarage.frontend.resources.BobWilsonsGarageServiceRestProtocol
 import com.bobwilsonsgarage.frontend.rest.{HostAndPath, RestApiServiceActor}
 import com.bobwilsonsgarage.frontend.server.ServerFrontendProtocol.{DependentServices, RequestDependentServices}
 import com.bobwilsonsgarage.frontend.util.{UrlEstablisher, UuidUtil}
-import common.protocol.BobWilsonsGarageProtocol.{BobWilsonsGarageServiceResult, GetBobWilsonsGarageServiceResult, BobWilsonsGarageServiceRequest}
+import common.protocol.BobWilsonsGarageProtocol.{BobWilsonsGarageServiceRequest, BobWilsonsGarageServiceResult, GetBobWilsonsGarageServiceResult}
 import common.protocol.FulfillmentProcessProtocol.InitiateFulfillmentProcess
 import common.protocol.ShardingProtocol.EntryEnvelope
 import common.shardingfunctions.FulfillmentProcessShardingFunctions
@@ -17,8 +16,8 @@ import spray.http.HttpHeaders.RawHeader
 import spray.http.StatusCodes
 import spray.routing.{HttpService, RequestContext}
 
-import scala.util.{Failure, Success}
 import scala.concurrent.duration._
+import scala.util.{Failure, Success}
 
 /**
  * BobWilsonsGarage Order rest routes.
@@ -33,11 +32,11 @@ trait OrdersRoutes extends HttpService with Logging {
     HostAndPath.hostAndPath(req)
   }
 
-  val fulfillmentProcessRegion: ActorRef = ClusterSharding(context.system).start(
+  val fulfillmentProcessRegion = ClusterSharding(context.system).startProxy(
     typeName = "FulfillmentProcess",
-    entryProps = None,
-    idExtractor = FulfillmentProcessShardingFunctions.idExtractor,
-    shardResolver = FulfillmentProcessShardingFunctions.shardResolver)
+    role = None,
+    extractEntityId = FulfillmentProcessShardingFunctions.idExtractor,
+    extractShardId = FulfillmentProcessShardingFunctions.shardResolver)
 
   import com.bobwilsonsgarage.frontend.resources.BobWilsonsGarageServiceRestProtocol._
   import context.dispatcher

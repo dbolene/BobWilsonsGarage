@@ -1,6 +1,6 @@
 package common.shardingfunctions
 
-import akka.contrib.pattern.ShardRegion
+import akka.cluster.sharding.ShardRegion
 import common.protocol.ShardingProtocol.EntryEnvelope
 
 /**
@@ -10,11 +10,11 @@ import common.protocol.ShardingProtocol.EntryEnvelope
  */
 object FulfillmentProcessShardingFunctions {
 
-  val idExtractor: ShardRegion.IdExtractor = {
+  val idExtractor: ShardRegion.ExtractEntityId = {
     case EntryEnvelope(id, payload) ⇒ (id, payload)
   }
 
-  val shardResolver: ShardRegion.ShardResolver = {
+  val shardResolver: ShardRegion.ExtractShardId = {
     case EntryEnvelope(id, _) ⇒ id
   }
 }

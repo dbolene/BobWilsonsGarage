@@ -2,12 +2,12 @@ package com.bobwilsonsgarage.backend.fulfillment
 
 import akka.actor.SupervisorStrategy.Stop
 import akka.actor.{ActorLogging, ActorRef, ReceiveTimeout}
-import akka.contrib.pattern.ShardRegion.Passivate
+import akka.cluster.sharding.ShardRegion.Passivate
 import akka.persistence.{PersistentActor, SaveSnapshotSuccess, SnapshotOffer}
-import common.protocol.BobWilsonsGarageProtocol.{BobWilsonsGarageServiceRequest, BobWilsonsGarageServiceResult, GetBobWilsonsGarageServiceResult}
-import common.protocol.CarRepairServiceProtocol.{CarCouldNotBeRepaired, CarRepairFinished, CarRepairRequest, CarRepairResponse}
-import common.protocol.DetailingServiceProtocol.{CarCouldNotBeDetailed, DetailingFinished, DetailingRequest, DetailingResponse}
-import common.protocol.FulfillmentProcessProtocol.{DoNothing, InitiateFulfillmentProcess}
+import common.protocol.BobWilsonsGarageProtocol._
+import common.protocol.CarRepairServiceProtocol._
+import common.protocol.DetailingServiceProtocol._
+import common.protocol.FulfillmentProcessProtocol._
 import common.statemachine.{PersistentStateMachine, PersistentStateMachineState, PersistentStateMachineStateRef}
 
 import scala.concurrent.duration._
@@ -152,7 +152,7 @@ class FulfillmentProcess extends PersistentActor with PersistentStateMachine wit
   }
 
   ////////////////////
-  // RepairingCar State
+  // Repairing Car State
   ////////////////////
   object RepairingCarState extends PersistentStateMachineState {
 
@@ -185,7 +185,7 @@ class FulfillmentProcess extends PersistentActor with PersistentStateMachine wit
   }
 
   ////////////////////
-  // DetailingCar State
+  // Detailing Car State
   ////////////////////s
   object DetailingCar extends PersistentStateMachineState {
 
@@ -212,7 +212,7 @@ class FulfillmentProcess extends PersistentActor with PersistentStateMachine wit
   }
 
   ////////////////////
-  // ServiceUnavailable State
+  // Service Unavailable State
   ////////////////////
   object ServiceUnavailable extends PersistentStateMachineState {
 

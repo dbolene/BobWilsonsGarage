@@ -4,6 +4,9 @@ import sbt.ExclusionRule
 import sbt.Keys._
 import java.io.File
 
+import com.typesafe.sbt.SbtNativePackager.autoImport._
+import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport._
+
 assemblySettings
 
 jarName in assembly := "BackEnd.jar"
@@ -20,13 +23,19 @@ mergeStrategy in assembly <<= (mergeStrategy in assembly) { (old) => {
 
 mainClass in assembly := Some("com.bobwilsonsgarage.backend.server.ServerBackend")
 
+maintainer in Docker := "David Bolene <dbolene@yahoo.com>"
+
+dockerBaseImage := "java:8"
+
+packageName in Docker := "bobwilsonsgaragebackend"
+
 organization := "com.bobwilsonsgarage"
 
 name := "BackEnd"
 
-version := "0.1-SNAPSHOT"
+version := "1.0"
 
-scalaVersion := "2.11.6"
+scalaVersion := "2.11.7"
 
 scalacOptions ++= Seq("-unchecked", "-deprecation")
 
@@ -38,7 +47,7 @@ persistTraceLevel := 0
 
 parallelExecution in Test := false
 
-val akkaVersion = "2.3.11"
+val akkaVersion = "2.4.0"
 
 net.virtualvoid.sbt.graph.Plugin.graphSettings
 
@@ -58,13 +67,15 @@ libraryDependencies += "com.typesafe.akka" % "akka-testkit_2.11" % akkaVersion %
 
 libraryDependencies += "com.typesafe.akka" % "akka-slf4j_2.11" % akkaVersion
 
-libraryDependencies += "com.typesafe.akka" %% "akka-persistence-experimental" % akkaVersion
+libraryDependencies += "com.typesafe.akka" %% "akka-persistence" % akkaVersion
 
 libraryDependencies += "com.typesafe.akka" %% "akka-contrib" % akkaVersion excludeAll (ExclusionRule(organization = "io.dropwizard.metrics"))
 
 libraryDependencies += "com.typesafe.akka" %% "akka-cluster" % akkaVersion excludeAll (ExclusionRule(organization = "io.dropwizard.metrics"))
 
-libraryDependencies += "com.github.krasserm" %% "akka-persistence-cassandra" % "0.3.7"
+libraryDependencies += "com.typesafe.akka" %% "akka-cluster-sharding" % akkaVersion
+
+libraryDependencies += "com.github.krasserm" %% "akka-persistence-cassandra" % "0.4"
 
 libraryDependencies += "com.typesafe.akka" %% "akka-cluster" % akkaVersion excludeAll (ExclusionRule(organization = "io.dropwizard.metrics"))
 

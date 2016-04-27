@@ -7,6 +7,7 @@ import spray.routing.{HttpService, PathMatchers}
 object RestApiServiceActor {
   def props(serverFrontEnd: ActorRef) = Props(new RestApiServiceActor(serverFrontEnd))
 }
+
 /**
  * REST top level actor.
  *

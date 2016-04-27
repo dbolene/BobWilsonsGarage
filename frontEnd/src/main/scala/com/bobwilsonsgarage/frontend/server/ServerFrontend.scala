@@ -1,9 +1,9 @@
 package com.bobwilsonsgarage.frontend.server
 
 import akka.actor._
-import akka.cluster.{MemberStatus, Cluster}
+import akka.cluster.{Cluster, MemberStatus}
 import akka.cluster.ClusterEvent.{CurrentClusterState, MemberUp}
-import akka.contrib.pattern.{ClusterSingletonManager, ClusterSingletonProxy}
+import akka.cluster.singleton.{ClusterSingletonManager, ClusterSingletonManagerSettings, ClusterSingletonProxy, ClusterSingletonProxySettings}
 import akka.io.IO
 import com.bobwilsonsgarage.frontend.rest.RestApiServiceActor
 import com.bobwilsonsgarage.frontend.server.ServerFrontendProtocol.{DependentServices, RequestDependentServices}
@@ -33,9 +33,8 @@ object ServerFrontend extends Logging {
 
     sys.actorOf(ClusterSingletonManager.props(
       singletonProps = ServiceRegistry.props,
-      singletonName = "registry",
       terminationMessage = End,
-      role = None),
+      settings = ClusterSingletonManagerSettings(sys)),
       name = "singleton")
 
     val frontend = sys.actorOf(Props[ServerFrontend], name = "frontend")
@@ -83,9 +82,9 @@ class ServerFrontend extends Actor with Logging {
     info("Exiting...")
   }
 
-  val registry = context.system.actorOf(ClusterSingletonProxy.props(
-    singletonPath = "/user/singleton/registry",
-    role = None),
+  val registry = sys.actorOf(ClusterSingletonProxy.props(
+    singletonManagerPath = "/user/singleton/registry",
+    settings = ClusterSingletonProxySettings(sys)),
     name = "registryProxy")
 
   var backends = IndexedSeq.empty[ActorRef]

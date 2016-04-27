@@ -1,7 +1,7 @@
 package com.bobwilsonsgarage.carrepair
 
 import akka.actor.ActorSystem
-import akka.contrib.pattern.ClusterSingletonProxy
+import akka.cluster.singleton.{ClusterSingletonProxy, ClusterSingletonProxySettings}
 import com.bobwilsonsgarage.carrepair.CarRepairServiceEndpointOverseerProtocol.CreateCarRepairServiceEndpoint
 import com.typesafe.config.ConfigFactory
 
@@ -21,8 +21,8 @@ object CarRepairServiceNode {
     val system = ActorSystem("ClusterSystem", config)
 
     val registry = system.actorOf(ClusterSingletonProxy.props(
-      singletonPath = "/user/singleton/registry",
-      role = None),
+      singletonManagerPath = "/user/singleton/registry",
+      settings = ClusterSingletonProxySettings(system)),
       name = "registryProxy")
 
     val carRepairServiceEndpointOverseer = system.actorOf(CarRepairServiceEndpointOverseer.props())

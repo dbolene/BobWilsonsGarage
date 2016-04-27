@@ -20,15 +20,21 @@ mergeStrategy in assembly <<= (mergeStrategy in assembly) { (old) => {
 
 mainClass in assembly := Some("com.bobwilsonsgarage.frontend.server.ServerFrontend")
 
+maintainer in Docker := "David Bolene <dbolene@yahoo.com>"
+
+dockerBaseImage := "java:8"
+
+packageName in Docker := "bobwilsonsgaragefrontend"
+
 javacOptions ++= Seq("-source", "1.6")
 
 organization := "com.bobwilsonsgarage"
 
 name := "FrontEnd"
 
-version := "1.0-Snapshot"
+version := "1.0"
 
-scalaVersion := "2.11.6"
+scalaVersion := "2.11.7"
 
 traceLevel in Test := 0
 
@@ -38,7 +44,7 @@ persistTraceLevel := 0
 
 parallelExecution in Test := false
 
-val akkaVersion = "2.3.11"
+val akkaVersion = "2.4.0"
 
 val sprayVersion = "1.3.3"
 
@@ -61,6 +67,8 @@ libraryDependencies += "com.typesafe.akka" % "akka-slf4j_2.11" % akkaVersion
 libraryDependencies += "com.typesafe.akka" %% "akka-contrib" % akkaVersion excludeAll (ExclusionRule(organization = "io.dropwizard.metrics"))
 
 libraryDependencies += "com.typesafe.akka" %% "akka-cluster" % akkaVersion excludeAll (ExclusionRule(organization = "io.dropwizard.metrics"))
+
+libraryDependencies += "com.typesafe.akka" %% "akka-cluster-sharding" % akkaVersion
 
 libraryDependencies += "io.spray" %% "spray-can" % sprayVersion
 

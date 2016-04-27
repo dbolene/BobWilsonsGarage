@@ -1,0 +1,71 @@
+version: '2'
+services:
+  backend1:
+    image: bobwilsonsgaragebackend:1.0
+    container_name: backend1
+    command: [-Dbobwilsonsgarage.port=2551, -Dbobwilsonsgarage.hostname=backend1]
+    ports:
+      - "2551:2551"
+    networks:
+      - back
+  backend2:
+    image: bobwilsonsgaragebackend:1.0
+    container_name: backend2
+    command: [-Dbobwilsonsgarage.port=2552, -Dbobwilsonsgarage.hostname=backend2]
+    ports:
+      - "2552:2552"
+    networks:
+      - back
+    depends_on:
+      - backend1
+  frontend:
+    image: bobwilsonsgaragefrontend:1.0
+    container_name: frontend
+    command: [-Dbobwilsonsgarage.port=2553, -Dbobwilsonsgarage.hostname=frontend]
+    ports:
+      - "2553:2553"
+      - "8080:8080"
+    networks:
+      - front
+      - back
+    depends_on:
+      - backend1
+      - backend2
+  staffing:
+    image: bobwilsonsgaragestaffing:1.0
+    container_name: staffing
+    command: [-Dbobwilsonsgarage.port=2554, -Dbobwilsonsgarage.hostname=staffing]
+    ports:
+      - "2554:2554"
+    networks:
+      - back
+    depends_on:
+      - backend1
+      - backend2
+  detailing:
+    image: bobwilsonsgaragedetailing:1.0
+    container_name: detailing
+    command: [-Dbobwilsonsgarage.port=2555, -Dbobwilsonsgarage.hostname=detailing]
+    ports:
+      - "2555:2555"
+    networks:
+      - back
+    depends_on:
+      - backend1
+      - backend2
+  carrepair:
+    image: bobwilsonsgaragecarrepair:1.0
+    container_name: carrepair
+    command: [-Dbobwilsonsgarage.port=2556, -Dbobwilsonsgarage.hostname=carrepair]
+    ports:
+      - "2556:2556"
+    networks:
+      - back
+    depends_on:
+      - backend1
+      - backend2
+networks:
+  front:
+    driver: overlay    
+  back:
+    driver: overlay    

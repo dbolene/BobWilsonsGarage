@@ -1,7 +1,7 @@
 package com.bobwilsonsgarage.detailing
 
 import akka.actor.ActorSystem
-import akka.contrib.pattern.ClusterSingletonProxy
+import akka.cluster.singleton.{ClusterSingletonProxy, ClusterSingletonProxySettings}
 import com.bobwilsonsgarage.detailing.DetailingServiceEndpointOverseerProtocol.CreateDetailingServiceEndpoint
 import com.typesafe.config.ConfigFactory
 
@@ -21,8 +21,8 @@ object DetailingServiceNode {
     val system = ActorSystem("ClusterSystem", config)
 
     val registry = system.actorOf(ClusterSingletonProxy.props(
-      singletonPath = "/user/singleton/registry",
-      role = None),
+      singletonManagerPath = "/user/singleton/registry",
+      settings = ClusterSingletonProxySettings(system)),
       name = "registryProxy")
 
     val detailingServiceEndpointOverseer = system.actorOf(DetailingServiceEndpointOverseer.props())

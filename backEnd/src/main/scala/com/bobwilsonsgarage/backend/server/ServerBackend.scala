@@ -2,8 +2,9 @@ package com.bobwilsonsgarage.backend.server
 
 import akka.actor._
 import akka.cluster.ClusterEvent.{CurrentClusterState, MemberUp}
+import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
+import akka.cluster.singleton.{ClusterSingletonManager, ClusterSingletonManagerSettings}
 import akka.cluster.{Cluster, Member, MemberStatus}
-import akka.contrib.pattern.{ClusterSharding, ClusterSingletonManager}
 import com.bobwilsonsgarage.backend.fulfillment.FulfillmentProcess
 import com.comcast.csv.akka.serviceregistry.ServiceRegistry
 import com.comcast.csv.akka.serviceregistry.ServiceRegistryInternalProtocol.End
@@ -24,17 +25,17 @@ object ServerBackend extends Logging {
 
     sys.actorOf(Props[ServerBackend], name = "backend")
 
-    val fulfillmentProcessRegion: ActorRef = ClusterSharding(sys).start(
+    val fulfillmentProcessRegion = ClusterSharding(sys).start(
       typeName = "FulfillmentProcess",
-      entryProps = Some(Props[FulfillmentProcess]),
-      idExtractor = FulfillmentProcessShardingFunctions.idExtractor,
-      shardResolver = FulfillmentProcessShardingFunctions.shardResolver)
+      entityProps = Props[FulfillmentProcess],
+      settings = ClusterShardingSettings(sys),
+      extractEntityId = FulfillmentProcessShardingFunctions.idExtractor,
+      extractShardId = FulfillmentProcessShardingFunctions.shardResolver)
 
     sys.actorOf(ClusterSingletonManager.props(
       singletonProps = ServiceRegistry.props,
-      singletonName = "registry",
       terminationMessage = End,
-      role = None),
+      settings = ClusterSingletonManagerSettings(sys)),
       name = "singleton")
 
   }

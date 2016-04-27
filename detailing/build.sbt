@@ -8,15 +8,21 @@ jarName in assembly := "DetailingService.jar"
 
 test in assembly := {}
 
+maintainer in Docker := "David Bolene <dbolene@yahoo.com>"
+
+dockerBaseImage := "java:8"
+
+packageName in Docker := "bobwilsonsgaragedetailing"
+
 organization := "com.bobwilsonsgarage"
 
 name := "bob-wilsons-detailingservice"
 
 version := "1.0"
 
-scalaVersion := "2.11.6"
+scalaVersion := "2.11.7"
 
-val akkaVersion = "2.3.11"
+val akkaVersion = "2.4.0"
 
 val sprayVersion = "1.3.3"
 
@@ -54,11 +60,15 @@ libraryDependencies += "com.typesafe.akka" % "akka-testkit_2.11" % akkaVersion %
 
 libraryDependencies += "com.typesafe.akka" % "akka-slf4j_2.11" % akkaVersion
 
-libraryDependencies += "com.typesafe.akka" %% "akka-persistence-experimental" % akkaVersion
+libraryDependencies += "com.typesafe.akka" %% "akka-persistence" % akkaVersion
 
 libraryDependencies += "com.typesafe.akka" %% "akka-contrib" % akkaVersion
 
 libraryDependencies += "com.typesafe.akka" %% "akka-cluster" % akkaVersion
+
+libraryDependencies += "com.typesafe.akka" %% "akka-cluster-sharding" % akkaVersion
+
+
 
 
 

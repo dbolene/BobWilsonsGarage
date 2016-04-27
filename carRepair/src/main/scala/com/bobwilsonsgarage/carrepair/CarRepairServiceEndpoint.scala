@@ -22,6 +22,7 @@ object CarRepairServiceEndpoint {
   def props = Props[CarRepairServiceEndpoint]
 
 }
+
 /**
  * Main call entry point into car repair service.
  *

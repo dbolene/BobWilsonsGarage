@@ -1,7 +1,7 @@
 package com.bobwilsonsgarage.staffing
 
 import akka.actor.ActorSystem
-import akka.contrib.pattern.ClusterSingletonProxy
+import akka.cluster.singleton.{ClusterSingletonManagerSettings, ClusterSingletonProxy, ClusterSingletonProxySettings}
 import com.bobwilsonsgarage.staffing.StaffingServiceEndpointOverseerProtocol.CreateStaffingServiceEndpoint
 import com.typesafe.config.ConfigFactory
 
@@ -21,8 +21,8 @@ object StaffingServiceNode {
     val system = ActorSystem("ClusterSystem", config)
 
     val registry = system.actorOf(ClusterSingletonProxy.props(
-      singletonPath = "/user/singleton/registry",
-      role = None),
+      singletonManagerPath = "/user/singleton/registry",
+      settings = ClusterSingletonProxySettings(system)),
       name = "registryProxy")
 
     val staffingServiceEndpointOverseer = system.actorOf(StaffingServiceEndpointOverseer.props())
