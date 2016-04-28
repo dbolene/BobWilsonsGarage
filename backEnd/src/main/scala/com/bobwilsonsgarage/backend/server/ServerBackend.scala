@@ -22,6 +22,7 @@ object ServerBackend extends Logging {
   def runMe(sys: ActorSystem): Unit = {
 
     info("ServerBackend runMe")
+    System.out.println("println ServerBackend runMe")
 
     sys.actorOf(Props[ServerBackend], name = "backend")
 
@@ -49,6 +50,8 @@ object ServerBackend extends Logging {
 
     val system = ActorSystem("ClusterSystem", config)
 
+    Thread.sleep(60000)
+
     runMe(system)
   }
 }
@@ -71,12 +74,12 @@ class ServerBackend extends Actor with ActorLogging {
     case state: CurrentClusterState =>
       state.members.filter(_.status == MemberStatus.Up) foreach register
     case MemberUp(m) =>
-      log.info(s"======= backend MemberUp")
+      log.info(s"======= backend MemberUp: $m")
       register(m)
   }
 
   def register(member: Member): Unit =
-    if (member.hasRole("frontend"))
-      context.actorSelection(RootActorPath(member.address) / "user" / "frontend") !
-        BackendRegistration
+    if (member.hasRole("frontend")) {
+      context.actorSelection(RootActorPath(member.address) / "user" / "frontend") ! BackendRegistration
+    }
 }

@@ -6,10 +6,10 @@ import akka.cluster.ClusterEvent.{CurrentClusterState, MemberUp}
 import akka.cluster.singleton.{ClusterSingletonManager, ClusterSingletonManagerSettings, ClusterSingletonProxy, ClusterSingletonProxySettings}
 import akka.io.IO
 import com.bobwilsonsgarage.frontend.rest.RestApiServiceActor
-import com.bobwilsonsgarage.frontend.server.ServerFrontendProtocol.{DependentServices, RequestDependentServices}
+import com.bobwilsonsgarage.frontend.server.ServerFrontendProtocol._
 import com.comcast.csv.akka.serviceregistry.ServiceRegistry
 import com.comcast.csv.akka.serviceregistry.ServiceRegistryInternalProtocol.End
-import com.comcast.csv.common.protocol.ServiceRegistryProtocol.{ServiceAvailable, ServiceUnAvailable, SubscribeToService}
+import com.comcast.csv.common.protocol.ServiceRegistryProtocol._
 import com.typesafe.config.ConfigFactory
 import common.protocol.ClusterNodeRegistrationProtocol.BackendRegistration
 import common.protocol.{CarRepairService, DetailingService}
@@ -30,6 +30,7 @@ object ServerFrontend extends Logging {
   def runMe(): Unit = {
 
     info("ServerFrontend runMe")
+    System.out.println("println ServerFrontend runMe")
 
     sys.actorOf(ClusterSingletonManager.props(
       singletonProps = ServiceRegistry.props,
@@ -42,15 +43,17 @@ object ServerFrontend extends Logging {
   }
 
   def main(args: Array[String]): Unit = {
+
+    info(s"main args: $args")
     // Override the configuration of the port when specified as program argument
     val port = if (args.isEmpty) "0" else args(0)
     val config = ConfigFactory.parseString(s"akka.remote.netty.tcp.port=$port").
       withFallback(ConfigFactory.parseString("akka.cluster.roles = [frontend]")).
       withFallback(ConfigFactory.load())
 
-    val portArg = if (args.isEmpty) "0" else args(0)
-
     sys = ActorSystem("ClusterSystem", config)
+
+    Thread.sleep(60000)
 
     runMe()
 
@@ -58,6 +61,8 @@ object ServerFrontend extends Logging {
 }
 
 class ServerFrontend extends Actor with Logging {
+
+  info(s"ServerFrontend constructor")
 
   val cluster = Cluster(context.system)
   var carRepairServiceEndpoint: Option[ActorRef] = None
@@ -126,7 +131,7 @@ class ServerFrontend extends Actor with Logging {
     case state: CurrentClusterState =>
       state.members
     case MemberUp(m) =>
-      info(s"======= backend MemberUp")
+      info(s"======= frontend MemberUp: $m")
     case unknown =>
       warn(s"Received unknown message: $unknown")
 

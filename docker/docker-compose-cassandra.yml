@@ -1,0 +1,16 @@
+version: '2'
+services:
+  cassandra:
+    image: cassandra
+    container_name: cassandra
+    ports:
+        - "9042:9042"
+    volumes:
+      - "db-data:/var/lib/cassandra"
+    networks:
+      - back
+networks:
+  back:
+    driver: overlay
+volumes:
+  db-data:
