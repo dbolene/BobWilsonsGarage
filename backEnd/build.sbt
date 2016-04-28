@@ -75,7 +75,7 @@ libraryDependencies += "com.typesafe.akka" %% "akka-cluster" % akkaVersion exclu
 
 libraryDependencies += "com.typesafe.akka" %% "akka-cluster-sharding" % akkaVersion
 
-libraryDependencies += "com.github.krasserm" %% "akka-persistence-cassandra" % "0.4"
+libraryDependencies += "com.github.krasserm" %% "akka-persistence-cassandra-3x" % "0.6"
 
 libraryDependencies += "com.typesafe.akka" %% "akka-cluster" % akkaVersion excludeAll (ExclusionRule(organization = "io.dropwizard.metrics"))
 

@@ -37,7 +37,7 @@ resolvers += "krasserm at bintray" at "http://dl.bintray.com/krasserm/maven"
 
 resolvers += "comcast oss" at "https://oss.sonatype.org/content/repositories/releases/com/comcast/"
 
-libraryDependencies += "com.github.krasserm" %% "akka-persistence-cassandra" % "0.4"
+libraryDependencies += "com.github.krasserm" %% "akka-persistence-cassandra-3x" % "0.6"
 
 libraryDependencies += "com.typesafe.akka" %% "akka-contrib" % akkaVersion excludeAll (ExclusionRule(organization = "io.dropwizard.metrics"))
 

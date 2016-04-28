@@ -50,8 +50,6 @@ object ServerBackend extends Logging {
 
     val system = ActorSystem("ClusterSystem", config)
 
-    Thread.sleep(60000)
-
     runMe(system)
   }
 }

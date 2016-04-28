@@ -32,11 +32,11 @@ object ServerFrontend extends Logging {
     info("ServerFrontend runMe")
     System.out.println("println ServerFrontend runMe")
 
-    sys.actorOf(ClusterSingletonManager.props(
+ /*   sys.actorOf(ClusterSingletonManager.props(
       singletonProps = ServiceRegistry.props,
       terminationMessage = End,
       settings = ClusterSingletonManagerSettings(sys)),
-      name = "singleton")
+      name = "singleton") */
 
     val frontend = sys.actorOf(Props[ServerFrontend], name = "frontend")
 
@@ -52,8 +52,6 @@ object ServerFrontend extends Logging {
       withFallback(ConfigFactory.load())
 
     sys = ActorSystem("ClusterSystem", config)
-
-    Thread.sleep(60000)
 
     runMe()
 
