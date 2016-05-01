@@ -21,9 +21,6 @@ object ServerBackend extends Logging {
 
   def runMe(sys: ActorSystem): Unit = {
 
-    info("ServerBackend runMe")
-    System.out.println("println ServerBackend runMe")
-
     sys.actorOf(Props[ServerBackend], name = "backend")
 
     val fulfillmentProcessRegion = ClusterSharding(sys).start(
@@ -72,16 +69,12 @@ class ServerBackend extends Actor with ActorLogging {
     case state: CurrentClusterState =>
       state.members.filter(_.status == MemberStatus.Up) foreach register
     case MemberUp(m) =>
-      log.info(s"======= backend MemberUp: $m")
+      log.info(s"Received -> MemberUp: $m")
       register(m)
   }
 
   def register(member: Member): Unit = {
-    log.info(s"======= backend member.hasRole(frontend): ${member.hasRole("frontend")}")
-    log.info(s"======= backend member.address: ${member.address}")
     if (member.hasRole("frontend")) {
-      log.info(s"======= confirmed backend member.hasRole(frontend)")
-      log.info(s"======= context.actorSelection(RootActorPath(member.address) / user / frontend): ${context.actorSelection(RootActorPath(member.address) / "user" / "frontend")}")
       context.actorSelection(RootActorPath(member.address) / "user" / "frontend") ! BackendRegistration
     }
   }

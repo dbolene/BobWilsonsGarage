@@ -29,9 +29,6 @@ object ServerFrontend extends Logging {
 
   def runMe(): Unit = {
 
-    info("ServerFrontend runMe")
-    System.out.println("println ServerFrontend runMe")
-
  /*   sys.actorOf(ClusterSingletonManager.props(
       singletonProps = ServiceRegistry.props,
       terminationMessage = End,
@@ -60,8 +57,6 @@ object ServerFrontend extends Logging {
 }
 
 class ServerFrontend extends Actor with ActorLogging {
-
-  System.out.println(s"ServerFrontend constructor")
 
   val cluster = Cluster(context.system)
   var carRepairServiceEndpoint: Option[ActorRef] = None
@@ -96,7 +91,6 @@ class ServerFrontend extends Actor with ActorLogging {
   def receive = {
     case BackendRegistration if !backends.contains(sender()) =>
       log.info(s"Received -> BackendRegistration")
-      System.out.println(s"println Received -> BackendRegistration")
       context watch sender()
       if (backends.isEmpty) {
         registry ! SubscribeToService(serviceName = CarRepairService.endpointName)
@@ -129,9 +123,10 @@ class ServerFrontend extends Actor with ActorLogging {
       sender() ! DependentServices(carRepairServiceEndpoint, detailingServiceEndpoint)
 
     case state: CurrentClusterState =>
+      log.info(s"Received -> CurrentClusterState")
       state.members
     case MemberUp(m) =>
-      log.info(s"======= frontend MemberUp: $m")
+      log.info(s"Received -> MemberUp: $m")
     case unknown =>
       log.warning(s"Received unknown message: $unknown")
 
