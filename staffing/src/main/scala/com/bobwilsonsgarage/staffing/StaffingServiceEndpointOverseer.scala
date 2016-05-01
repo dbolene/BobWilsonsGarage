@@ -25,6 +25,7 @@ class StaffingServiceEndpointOverseer extends Actor with ActorLogging {
   override def receive = {
 
     case csse: CreateStaffingServiceEndpoint =>
+      log.info(s"Received -> CreateStaffingServiceEndpoint")
       try {
         val staffingServiceActor = context.actorOf(StaffingServiceEndpoint.props, StaffingService.endpointName)
         staffingServiceActor ! InitializeStaffingServiceEndpoint(csse.registry)
@@ -36,7 +37,7 @@ class StaffingServiceEndpointOverseer extends Actor with ActorLogging {
       }
 
     case msg =>
-      log.info(s"received unknown message: $msg")
+      log.warning(s"received unknown message: $msg")
   }
 
   override val supervisorStrategy =

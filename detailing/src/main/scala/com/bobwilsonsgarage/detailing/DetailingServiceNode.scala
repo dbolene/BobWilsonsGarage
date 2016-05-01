@@ -21,7 +21,7 @@ object DetailingServiceNode {
     val system = ActorSystem("ClusterSystem", config)
 
     val registry = system.actorOf(ClusterSingletonProxy.props(
-      singletonManagerPath = "/user/singleton/registry",
+      singletonManagerPath = "/user/registry",
       settings = ClusterSingletonProxySettings(system)),
       name = "registryProxy")
 

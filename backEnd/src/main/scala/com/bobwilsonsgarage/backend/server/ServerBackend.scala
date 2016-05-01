@@ -37,7 +37,7 @@ object ServerBackend extends Logging {
       singletonProps = ServiceRegistry.props,
       terminationMessage = End,
       settings = ClusterSingletonManagerSettings(sys)),
-      name = "singleton")
+      name = "registry")
 
   }
 
@@ -76,8 +76,13 @@ class ServerBackend extends Actor with ActorLogging {
       register(m)
   }
 
-  def register(member: Member): Unit =
+  def register(member: Member): Unit = {
+    log.info(s"======= backend member.hasRole(frontend): ${member.hasRole("frontend")}")
+    log.info(s"======= backend member.address: ${member.address}")
     if (member.hasRole("frontend")) {
+      log.info(s"======= confirmed backend member.hasRole(frontend)")
+      log.info(s"======= context.actorSelection(RootActorPath(member.address) / user / frontend): ${context.actorSelection(RootActorPath(member.address) / "user" / "frontend")}")
       context.actorSelection(RootActorPath(member.address) / "user" / "frontend") ! BackendRegistration
     }
+  }
 }

@@ -36,6 +36,20 @@ libraryDependencies += "junit" % "junit" % "4.5" % "test"
 
 libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.1.5" % "test"
 
+val slf4jOrg = "org.slf4j"
+
+val slf4jVersion = "1.7.10"
+
+libraryDependencies +=  slf4jOrg % "slf4j-api" % slf4jVersion
+
+libraryDependencies +=  slf4jOrg % "log4j-over-slf4j" % slf4jVersion
+
+libraryDependencies +=  slf4jOrg % "jcl-over-slf4j" % slf4jVersion % "test"
+
+libraryDependencies +=  slf4jOrg % "jul-to-slf4j" % slf4jVersion % "test"
+
+libraryDependencies +=  slf4jOrg % "slf4j-simple" % slf4jVersion
+
 libraryDependencies += "com.typesafe.akka" % "akka-actor_2.11" % akkaVersion
 
 libraryDependencies += "com.typesafe.akka" % "akka-agent_2.11" % akkaVersion

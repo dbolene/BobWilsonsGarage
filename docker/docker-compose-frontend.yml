@@ -1,0 +1,14 @@
+version: '2'
+services:
+  frontend:
+    image: bobwilsonsgaragefrontend:1.0
+    container_name: frontend
+    command: ["2553", -Dbobwilsonsgarage.port=2553, -Dbobwilsonsgarage.hostname=frontend]
+    ports:
+      - "2553:2553"
+      - "8080:8080"
+    networks:
+      - back
+networks:
+  back:
+    driver: overlay

@@ -39,6 +39,7 @@ object ServerFrontend extends Logging {
       name = "singleton") */
 
     val frontend = sys.actorOf(Props[ServerFrontend], name = "frontend")
+    System.out.println(s"println frontend: $frontend")
 
   }
 
@@ -58,9 +59,9 @@ object ServerFrontend extends Logging {
   }
 }
 
-class ServerFrontend extends Actor with Logging {
+class ServerFrontend extends Actor with ActorLogging {
 
-  info(s"ServerFrontend constructor")
+  System.out.println(s"ServerFrontend constructor")
 
   val cluster = Cluster(context.system)
   var carRepairServiceEndpoint: Option[ActorRef] = None
@@ -82,11 +83,11 @@ class ServerFrontend extends Actor with Logging {
   // our IOBridge into the shutdown of the applications ActorSystem
   context.system.registerOnTermination {
     Http.Unbind
-    info("Exiting...")
+    log.info("Exiting...")
   }
 
   val registry = sys.actorOf(ClusterSingletonProxy.props(
-    singletonManagerPath = "/user/singleton/registry",
+    singletonManagerPath = "/user/registry",
     settings = ClusterSingletonProxySettings(sys)),
     name = "registryProxy")
 
@@ -94,7 +95,8 @@ class ServerFrontend extends Actor with Logging {
 
   def receive = {
     case BackendRegistration if !backends.contains(sender()) =>
-      info(s"Received -> BackendRegistration")
+      log.info(s"Received -> BackendRegistration")
+      System.out.println(s"println Received -> BackendRegistration")
       context watch sender()
       if (backends.isEmpty) {
         registry ! SubscribeToService(serviceName = CarRepairService.endpointName)
@@ -103,35 +105,35 @@ class ServerFrontend extends Actor with Logging {
       backends = backends :+ sender()
 
     case Terminated(a) =>
-      info(s"Received -> Terminated($a)")
+      log.info(s"Received -> Terminated($a)")
       backends = backends.filterNot(_ == a)
 
     case serviceAvailable: ServiceAvailable if serviceAvailable.serviceName == CarRepairService.endpointName =>
-      info(s"Received -> ServiceAvailable: ${serviceAvailable.serviceName}")
+      log.info(s"Received -> ServiceAvailable: ${serviceAvailable.serviceName}")
       carRepairServiceEndpoint = Option(serviceAvailable.serviceEndpoint)
 
     case serviceUnAvailable: ServiceUnAvailable if serviceUnAvailable.serviceName == CarRepairService.endpointName =>
-      info(s"Received -> ServiceUnAvailable: ${serviceUnAvailable.serviceName}")
+      log.info(s"Received -> ServiceUnAvailable: ${serviceUnAvailable.serviceName}")
       carRepairServiceEndpoint = None
 
     case serviceAvailable: ServiceAvailable if serviceAvailable.serviceName == DetailingService.endpointName =>
-      info(s"Received -> ServiceAvailable: ${serviceAvailable.serviceName}")
+      log.info(s"Received -> ServiceAvailable: ${serviceAvailable.serviceName}")
       detailingServiceEndpoint = Option(serviceAvailable.serviceEndpoint)
 
     case serviceUnAvailable: ServiceUnAvailable if serviceUnAvailable.serviceName == DetailingService.endpointName =>
-      info(s"Received -> ServiceUnAvailable: ${serviceUnAvailable.serviceName}")
+      log.info(s"Received -> ServiceUnAvailable: ${serviceUnAvailable.serviceName}")
       detailingServiceEndpoint = None
 
     case RequestDependentServices =>
-      info(s"Received -> RequestDependentServices")
+      log.info(s"Received -> RequestDependentServices")
       sender() ! DependentServices(carRepairServiceEndpoint, detailingServiceEndpoint)
 
     case state: CurrentClusterState =>
       state.members
     case MemberUp(m) =>
-      info(s"======= frontend MemberUp: $m")
+      log.info(s"======= frontend MemberUp: $m")
     case unknown =>
-      warn(s"Received unknown message: $unknown")
+      log.warning(s"Received unknown message: $unknown")
 
   }
 }
