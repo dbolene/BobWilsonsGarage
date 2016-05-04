@@ -15,6 +15,7 @@ import common.protocol.ClusterNodeRegistrationProtocol.BackendRegistration
 import common.protocol.{CarRepairService, DetailingService}
 import common.util.Logging
 import spray.can.Http
+import spray.can.Http.Bound
 
 /**
  * FrontEnd Server main.
@@ -42,11 +43,7 @@ object ServerFrontend extends Logging {
 
   def main(args: Array[String]): Unit = {
 
-    info(s"main args: $args")
-    // Override the configuration of the port when specified as program argument
-    val port = if (args.isEmpty) "0" else args(0)
-    val config = ConfigFactory.parseString(s"akka.remote.netty.tcp.port=$port").
-      withFallback(ConfigFactory.parseString("akka.cluster.roles = [frontend]")).
+    val config = ConfigFactory.parseString("akka.cluster.roles = [frontend]").
       withFallback(ConfigFactory.load())
 
     sys = ActorSystem("ClusterSystem", config)
@@ -124,9 +121,11 @@ class ServerFrontend extends Actor with ActorLogging {
 
     case state: CurrentClusterState =>
       log.info(s"Received -> CurrentClusterState")
-      state.members
+      //state.members
     case MemberUp(m) =>
       log.info(s"Received -> MemberUp: $m")
+    case b: Bound =>
+      log.info(s"Received -> Bound: $b")
     case unknown =>
       log.warning(s"Received unknown message: $unknown")
 

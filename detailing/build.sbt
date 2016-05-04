@@ -50,24 +50,6 @@ libraryDependencies +=  slf4jOrg % "jul-to-slf4j" % slf4jVersion % "test"
 
 libraryDependencies +=  slf4jOrg % "slf4j-simple" % slf4jVersion
 
-libraryDependencies += "com.typesafe.akka" % "akka-actor_2.11" % akkaVersion
-
-libraryDependencies += "com.typesafe.akka" % "akka-agent_2.11" % akkaVersion
-
-libraryDependencies += "com.typesafe.akka" % "akka-remote_2.11" % akkaVersion
-
-libraryDependencies += "com.typesafe.akka" % "akka-testkit_2.11" % akkaVersion % "test"
-
-libraryDependencies += "com.typesafe.akka" % "akka-slf4j_2.11" % akkaVersion
-
-libraryDependencies += "com.typesafe.akka" %% "akka-persistence" % akkaVersion
-
-libraryDependencies += "com.typesafe.akka" %% "akka-contrib" % akkaVersion
-
-libraryDependencies += "com.typesafe.akka" %% "akka-cluster" % akkaVersion
-
-libraryDependencies += "com.typesafe.akka" %% "akka-cluster-sharding" % akkaVersion
-
 
 
 

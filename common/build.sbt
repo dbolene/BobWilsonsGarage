@@ -19,8 +19,6 @@ libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.1.5" % "test"
 
 libraryDependencies += "org.scala-lang" % "scala-compiler" % scalaVersion.value % "test"
 
-//libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.2"
-
 libraryDependencies += "com.typesafe.akka" % "akka-actor_2.11" % akkaVersion
 
 libraryDependencies += "com.typesafe.akka" % "akka-agent_2.11" % akkaVersion

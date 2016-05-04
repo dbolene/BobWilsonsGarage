@@ -50,25 +50,9 @@ val sprayVersion = "1.3.3"
 
 net.virtualvoid.sbt.graph.Plugin.graphSettings
 
-//libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.3" excludeAll (ExclusionRule(organization = "org.slf4j"))
-
 libraryDependencies += "junit" % "junit" % "4.5" % "test"
 
 libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.1.5" % "test"
-
-libraryDependencies += "com.typesafe.akka" % "akka-actor_2.11" % akkaVersion
-
-libraryDependencies += "com.typesafe.akka" % "akka-agent_2.11" % akkaVersion
-
-libraryDependencies += "com.typesafe.akka" % "akka-remote_2.11" % akkaVersion
-
-libraryDependencies += "com.typesafe.akka" % "akka-slf4j_2.11" % akkaVersion
-
-libraryDependencies += "com.typesafe.akka" %% "akka-contrib" % akkaVersion excludeAll (ExclusionRule(organization = "io.dropwizard.metrics"))
-
-libraryDependencies += "com.typesafe.akka" %% "akka-cluster" % akkaVersion excludeAll (ExclusionRule(organization = "io.dropwizard.metrics"))
-
-libraryDependencies += "com.typesafe.akka" %% "akka-cluster-sharding" % akkaVersion
 
 libraryDependencies += "io.spray" %% "spray-can" % sprayVersion
 

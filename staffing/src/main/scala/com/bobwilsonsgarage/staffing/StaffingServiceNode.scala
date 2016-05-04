@@ -14,9 +14,7 @@ import common.util.Logging
 object StaffingServiceNode extends Logging {
   def main(args: Array[String]): Unit = {
     // Override the configuration of the port when specified as program argument
-    val port = if (args.isEmpty) "0" else args(0)
-    val config = ConfigFactory.parseString(s"akka.remote.netty.tcp.port=$port").
-      withFallback(ConfigFactory.parseString("akka.cluster.roles = [staffingservice]")).
+    val config = ConfigFactory.parseString("akka.cluster.roles = [staffingservice]").
       withFallback(ConfigFactory.load())
 
     val system = ActorSystem("ClusterSystem", config)
@@ -27,9 +25,6 @@ object StaffingServiceNode extends Logging {
       name = "registryProxy")
 
     val staffingServiceEndpointOverseer = system.actorOf(StaffingServiceEndpointOverseer.props())
-
-    loggr.info(s"port used: $port")
-    System.out.println(s"println port used: $port")
 
     staffingServiceEndpointOverseer ! CreateStaffingServiceEndpoint(registry = registry)
   }
