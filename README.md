@@ -27,87 +27,117 @@ Usage
 --------
 </a>
 
+### Install Docker
+
+Install Docker Toolbox: [https://www.docker.com/products/docker-toolbox](https://www.docker.com/products/docker-toolbox "Docker Toolbox")
+
+### Start a Docker Swarm cluster
+
+```
+// the key value store
+docker-machine create -d virtualbox consul
+
+// switch docker client to the consul machine
+eval "$(docker-machine env consul)"
+
+// run the consul container
+docker run -d -p 8500:8500 -h consul progrium/consul -server -bootstrap
+
+// start up the swarm-master node
+docker-machine create -d virtualbox --swarm --swarm-master --swarm-discovery=consul://$(docker-machine ip consul):8500 --engine-opt="cluster-store=consul://$(docker-machine ip consul):8500" --engine-opt="cluster-advertise=eth1:2376" swarm-master
+
+// start up the swarm-agent-00 node
+docker-machine create -d virtualbox --swarm --swarm-discovery=consul://$(docker-machine ip consul):8500 --engine-label instance=java --engine-opt="cluster-store=consul://$(docker-machine ip consul):8500" --engine-opt="cluster-advertise=eth1:2376" swarm-agent-00
+
+// start up the swarm-agent-01 node
+docker-machine create -d virtualbox --swarm --swarm-discovery=consul://$(docker-machine ip consul):8500 --engine-label instance=db --engine-opt="cluster-store=consul://$(docker-machine ip consul):8500" --engine-opt="cluster-advertise=eth1:2376" swarm-agent-01
+
+// switch docker client to the swarm master machine
+eval $(docker-machine env --swarm swarm-master)
+
+// list the machines
+docker-machine ls
+
+// get info on the cluster
+docker info
+```
+
+### Switch to the project directory
+
+```
+cd ~/path/to/project/BobWilsonsGarage
+```
+
+### Create an overlay network called 'back'
+
+```
+docker network create --driver overlay --subnet=10.0.9.0/24 back
+```
+
+### Start a single node cassandra container with ephimeral persistence suitable for testing
+
+```
+docker run -d -p 9042:9042 --name cassandra --net=back cassandra
+
+// wait for cassandra to initialize (ctrl+z to stop log tailing)
+docker logs -f cassandra
+
+// create the keyspaces
+docker exec -it cassandra cqlsh
+CREATE KEYSPACE bobwilsonsgaragejournal WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+CREATE KEYSPACE bobwilsonsgaragesnapshot WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+exit;
+```
+
 ### Start sbt 
 
 ```
-cd ~/path/to/project/BobWilsonsGarage
 sbt
 ```
-#### Setup
 
-Build the cluster node jars (from sbt)
-
-```
-assembly
-```
-
-Install a single development node version of Cassandra and then run it (from the console)
+### Publish the docker images 
 
 ```
-cd ~/path/to/cassandra/dsc-cassandra-2.1.4
-bin/cassandra -f
+// publish docker images to the swarm cluster
+docker:publishLocal
+
+// exit sbt
+exit
 ```
 
-#####Run the cluster nodes (from the console)
-
-Run the first backend shard node
+### Run the containers 
 
 ```
-cd ~/path/to/project/BobWilsonsGarage
+docker run -d -p 2551:2551 --name backend1 --net=back bobwilsonsgaragebackend:1.0 -Dbobwilsonsgarage.port=2551 -Dbobwilsonsgarage.hostname=backend1
 
-java -jar backEnd/target/scala-2.11/BackEnd.jar 2551
+docker run -d -p 2552:2552 --name backend2 --net=back bobwilsonsgaragebackend:1.0 -Dbobwilsonsgarage.port=2552 -Dbobwilsonsgarage.hostname=backend2
+
+docker run -d -p 2554:2554 --name staffing --net=back bobwilsonsgaragestaffing:1.0 -Dbobwilsonsgarage.port=2554 -Dbobwilsonsgarage.hostname=staffing
+
+docker run -d -p 2555:2555 --name detailing --net=back bobwilsonsgaragedetailing:1.0 -Dbobwilsonsgarage.port=2555 -Dbobwilsonsgarage.hostname=detailing
+
+docker run -d -p 2556:2556 --name carrepair --net=back bobwilsonsgaragecarrepair:1.0 -Dbobwilsonsgarage.port=2556 -Dbobwilsonsgarage.hostname=carrepair
+
+docker run -d -p 2553:2553 -p 8080:8080 --name frontend --net=back bobwilsonsgaragefrontend:1.0 -Dbobwilsonsgarage.port=2553 -Dbobwilsonsgarage.hostname=frontend
 ```
 
-Run the second backend shard node
 
+### Take note of the IP for the frontend container
 ```
-cd ~/path/to/project/BobWilsonsGarage
-
-java -jar backEnd/target/scala-2.11/BackEnd.jar 2552
+docker inspect -f {{.Node.IP}} frontend
 ```
 
-Run the frontend rest node
-
-
-```
-cd ~/path/to/project/BobWilsonsGarage
-
-java -jar frontEnd/target/scala-2.11/FrontEnd.jar 2553
-```
-
-Run the staffing service microservice rest node
+Will return something like:
 
 ```
-cd ~/path/to/project/BobWilsonsGarage
-
-java -jar frontEnd/target/scala-2.11/StaffingService 2554
+192.168.99.103
 ```
+### Use the REST api
 
-Run the staffing service microservice rest node
-
-```
-cd ~/path/to/project/BobWilsonsGarage
-
-java -jar frontEnd/target/scala-2.11/DetailingService.jar 2555
-```
-
-Run the staffing service microservice rest node
+Post a car repair fulfillment request
 
 ```
-cd ~/path/to/project/BobWilsonsGarage
-
-java -jar frontEnd/target/scala-2.11/CarRepairService.jar 2556
-```
-
-Use ctrl+c to stop cluster nodes.
-
-
-#### Use the REST api:
-
-Post a car repair service order:
-
-```
-curl -i -H "Content-Type: application/json" -X POST -d '{"car":"HotRod"}' http://localhost:8080/BobWilsonsGarage/orders
+curl -i -H "Content-Type: application/json" -X POST -d '{"car":"HotRod"}' http://192.168.99.103:8080/BobWilsonsGarage/orders
 ```
 
 Will return something like:
@@ -116,14 +146,14 @@ Will return something like:
 HTTP/1.1 202 Accepted
 Server: spray-can/1.3.3
 Date: Thu, 17 Sep 2015 19:56:08 GMT
-Location: http://localhost:8080/BobWilsonsGarage/orders/7d25459a-9ff8-4752-ae3f-636b32cbe21a
+Location: http://192.168.99.103:8080/BobWilsonsGarage/orders/7d25459a-9ff8-4752-ae3f-636b32cbe21a
 Content-Length: 0
 ```
 
 Do a GET on the url returned in the Location header:
 
 ```
-curl http://localhost:8080/BobWilsonsGarage/orders/7d25459a-9ff8-4752-ae3f-636b32cbe21a
+curl http://192.168.99.103:8080/BobWilsonsGarage/orders/7d25459a-9ff8-4752-ae3f-636b32cbe21a
 ```
 
 returns:
@@ -137,12 +167,16 @@ returns:
   "detailedYN": true
 }
 ```
-Knock down the CarRepairService node (ctrl+c its console)
+Knock down the CarRepairService node
+
+```
+docker stop carrepair
+```
 
 Post a car repair service order:
 
 ```
-curl -i -H "Content-Type: application/json" -X POST -d '{"car":"HotRod"}' http://localhost:8080/BobWilsonsGarage/orders
+curl -i -H "Content-Type: application/json" -X POST -d '{"car":"HotRod"}' http://192.168.99.103:8080/BobWilsonsGarage/orders
 ```
 
 Will return something like:
@@ -151,16 +185,17 @@ Will return something like:
 HTTP/1.1 202 Accepted
 Server: spray-can/1.3.3
 Date: Thu, 17 Sep 2015 19:56:08 GMT
-Location: http://localhost:8080/BobWilsonsGarage/orders/54586309-d2a9-400d-b374-674922b44a3a
-Content-Length: 0```
+Location: http://192.168.99.103:8080/BobWilsonsGarage/orders/54586309-d2a9-400d-b374-674922b44a3a
+Content-Length: 0
+```
 
 Do a GET on the url returned in the Location header:
 
 ```
-curl http://localhost:8080/BobWilsonsGarage/orders/54586309-d2a9-400d-b374-674922b44a3a
+curl http://192.168.99.103:8080/BobWilsonsGarage/orders/54586309-d2a9-400d-b374-674922b44a3a
 ```
 
-returns:
+returns (because the carrepair service is unavailable):
 
 ```
 {
@@ -172,15 +207,15 @@ returns:
 }
 ```
 
+
+
 Restart the CarRepairService node:
 
 ```
-cd ~/path/to/project/BobWilsonsGarage
-
-java -jar frontEnd/target/scala-2.11/CarRepairService.jar 2556
+docker start carrepair
 ```
 
-Try to POST again, rinse, repeat, experiment.
+Try to POST again, rinse, repeat, experiment (like try just stopping the detailing container/service).
 
 
 <a name="resources">
