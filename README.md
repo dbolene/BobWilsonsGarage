@@ -31,10 +31,10 @@ Usage
 
 Install Docker Toolbox: [https://www.docker.com/products/docker-toolbox](https://www.docker.com/products/docker-toolbox "Docker Toolbox")
 
-### Start a Docker Swarm cluster
+### Start a 3 node Docker Swarm cluster
 
 ```
-// the key value store
+// the key value store for the cluster
 docker-machine create -d virtualbox consul
 
 // switch docker client to the consul machine
@@ -60,6 +60,7 @@ docker-machine ls
 
 // get info on the cluster
 docker info
+
 ```
 
 ### Switch to the project directory
@@ -121,6 +122,11 @@ docker run -d -p 2556:2556 --name carrepair --net=back bobwilsonsgaragecarrepair
 docker run -d -p 2553:2553 -p 8080:8080 --name frontend --net=back bobwilsonsgaragefrontend:1.0 -Dbobwilsonsgarage.port=2553 -Dbobwilsonsgarage.hostname=frontend
 ```
 
+```
+// list the running containers
+docker ps -a
+```
+
 
 ### Take note of the IP for the frontend container
 ```
@@ -132,7 +138,7 @@ Will return something like:
 ```
 192.168.99.103
 ```
-### Use the REST api
+### Use the REST api with the frontend ip from above
 
 Post a car repair fulfillment request
 
@@ -217,6 +223,19 @@ docker start carrepair
 
 Try to POST again, rinse, repeat, experiment (like try just stopping the detailing container/service).
 
+### Shutdown the swarm cluster 
+
+```
+docker-machine stop swarm-agent-00
+docker-machine stop swarm-agent-01
+docker-machine stop swarm-master
+docker-machine stop consul
+docker-machine rm -f swarm-agent-00
+docker-machine rm -f swarm-agent-01
+docker-machine rm -f swarm-master
+docker-machine rm -f consul
+```
+
 
 <a name="resources">
 Resources
@@ -227,3 +246,4 @@ Akka Service Registry Repo: [https://github.com/Comcast/ActorServiceRegistry](ht
 
 SOA on Steroids presentation: [http://www.slideshare.net/dbolene/soa-on-steroids](http://www.slideshare.net/dbolene/soa-on-steroids "SOA On Steroids")
 
+Presentation Video (starts at minute 27): [https://www.youtube.com/watch?v=QRnHuBL-aSU](https://www.youtube.com/watch?v=QRnHuBL-aSU "Presentation Video")
