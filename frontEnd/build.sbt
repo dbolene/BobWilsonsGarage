@@ -44,7 +44,7 @@ persistTraceLevel := 0
 
 parallelExecution in Test := false
 
-val akkaVersion = "2.4.0"
+val akkaVersion = "2.4.4"
 
 val sprayVersion = "1.3.3"
 

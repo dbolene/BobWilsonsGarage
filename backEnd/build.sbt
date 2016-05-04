@@ -47,7 +47,7 @@ persistTraceLevel := 0
 
 parallelExecution in Test := false
 
-val akkaVersion = "2.4.0"
+val akkaVersion = "2.4.4"
 
 net.virtualvoid.sbt.graph.Plugin.graphSettings
 

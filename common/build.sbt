@@ -9,7 +9,7 @@ version := "1.0-Snapshot"
 
 scalaVersion := "2.11.7"
 
-val akkaVersion = "2.4.0"
+val akkaVersion = "2.4.4"
 
 net.virtualvoid.sbt.graph.Plugin.graphSettings
 
