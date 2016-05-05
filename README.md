@@ -34,7 +34,7 @@ Install Docker Toolbox: [https://www.docker.com/products/docker-toolbox](https:/
 ### Start a 3 node Docker Swarm cluster
 
 ```
-// the key value store for the cluster
+// start the machine to host the key value store for the cluster
 docker-machine create -d virtualbox consul
 
 // switch docker client to the consul machine
