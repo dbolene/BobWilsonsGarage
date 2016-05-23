@@ -109,22 +109,27 @@ exit
 ### Run the containers 
 
 ```
-docker run -d -p 2551:2551 --name backend1 --net=back bobwilsonsgaragebackend:1.0 -Dbobwilsonsgarage.port=2551 -Dbobwilsonsgarage.hostname=backend1
+docker run -d -p 2551:2551  -p 25519:9999 --name backend1 --net=back bobwilsonsgaragebackend:1.0 -Dbobwilsonsgarage.port=2551 -Dbobwilsonsgarage.hostname=backend1 -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
 
-docker run -d -p 2552:2552 --name backend2 --net=back bobwilsonsgaragebackend:1.0 -Dbobwilsonsgarage.port=2552 -Dbobwilsonsgarage.hostname=backend2
+docker run -d -p 2552:2552 -p 25529:9999 --name backend2 --net=back bobwilsonsgaragebackend:1.0 -Dbobwilsonsgarage.port=2552 -Dbobwilsonsgarage.hostname=backend2 -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
 
-docker run -d -p 2554:2554 --name staffing --net=back bobwilsonsgaragestaffing:1.0 -Dbobwilsonsgarage.port=2554 -Dbobwilsonsgarage.hostname=staffing
+docker run -d -p 2554:2554 -p 25549:9999 --name staffing --net=back bobwilsonsgaragestaffing:1.0 -Dbobwilsonsgarage.port=2554 -Dbobwilsonsgarage.hostname=staffing -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
 
-docker run -d -p 2555:2555 --name detailing --net=back bobwilsonsgaragedetailing:1.0 -Dbobwilsonsgarage.port=2555 -Dbobwilsonsgarage.hostname=detailing
+docker run -d -p 2555:2555 -p 25559:9999 --name detailing --net=back bobwilsonsgaragedetailing:1.0 -Dbobwilsonsgarage.port=2555 -Dbobwilsonsgarage.hostname=detailing -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
 
-docker run -d -p 2556:2556 --name carrepair --net=back bobwilsonsgaragecarrepair:1.0 -Dbobwilsonsgarage.port=2556 -Dbobwilsonsgarage.hostname=carrepair
+docker run -d -p 2556:2556 -p 25569:9999 --name carrepair --net=back bobwilsonsgaragecarrepair:1.0 -Dbobwilsonsgarage.port=2556 -Dbobwilsonsgarage.hostname=carrepai r-Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
 
-docker run -d -p 2553:2553 -p 8080:8080 --name frontend --net=back bobwilsonsgaragefrontend:1.0 -Dbobwilsonsgarage.port=2553 -Dbobwilsonsgarage.hostname=frontend
+docker run -d -p 2553:2553 -p 8080:8080 -p 25539:9999 --name frontend --net=back bobwilsonsgaragefrontend:1.0 -Dbobwilsonsgarage.port=2553 -Dbobwilsonsgarage.hostname=frontend -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
 ```
 
 ```
 // list the running containers
 docker ps -a
+```
+
+```
+// inspect the akka cluster through jmx via the akka cluster CLI
+docker run --net=back --rm dbolene/akkaclusterbin:1.0 $(docker inspect -f {{.Node.IP}} backend1) 25519 cluster-status
 ```
 
 
@@ -173,10 +178,12 @@ returns:
   "detailedYN": true
 }
 ```
-Knock down the CarRepairService node
+Knock down the CarRepairService node (first down the akka cluster node via the Akka-cluster ClI and then stop the docker container)
 
 ```
-docker stop carrepair
+docker run --net=back --rm dbolene/akkaclusterbin:1.0 $(docker inspect -f {{.Node.IP}} backend1) 25519 down akka.tcp://ClusterSystem@detailing:2555
+
+docker stop detailing
 ```
 
 Post a car repair service order:
@@ -213,12 +220,16 @@ returns (because the carrepair service is unavailable):
 }
 ```
 
+Remove stopped containers:
 
+```
+docker rm -v $(docker ps -aq -f status=exited)
+```
 
 Restart the CarRepairService node:
 
 ```
-docker start carrepair
+docker run -d -p 2555:2555 -p 25559:9999 --name detailing --net=back bobwilsonsgaragedetailing:1.0 -Dbobwilsonsgarage.port=2555 -Dbobwilsonsgarage.hostname=detailing -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
 ```
 
 Try to POST again, rinse, repeat, experiment (like try just stopping the detailing container/service).
@@ -247,3 +258,6 @@ Akka Service Registry Repo: [https://github.com/Comcast/ActorServiceRegistry](ht
 SOA on Steroids presentation: [http://www.slideshare.net/dbolene/soa-on-steroids](http://www.slideshare.net/dbolene/soa-on-steroids "SOA On Steroids")
 
 Presentation Video (starts at minute 27): [https://www.youtube.com/watch?v=QRnHuBL-aSU](https://www.youtube.com/watch?v=QRnHuBL-aSU "Presentation Video")
+
+Akka Cluster JMX CLI invoker container: [https://hub.docker.com/r/dbolene/akkaclusterbin/](https://hub.docker.com/r/dbolene/akkaclusterbin/ "Akka Cluster JMX CLI invoker container")
+
