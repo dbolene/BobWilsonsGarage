@@ -18,7 +18,7 @@ Description
 --------
 </a>
 
-Bob Wilson's Garage is a contrived Akka cluster microservice example.
+Bob Wilson's Garage is a contrived Akka cluster microservice example deployed in Docker Swarm.
 
 *We repair your car (if our staff showed up today) and detail it for free!*
 
@@ -181,7 +181,7 @@ returns:
 Knock down the CarRepairService node (first down the akka cluster node via the Akka-cluster ClI and then stop the docker container)
 
 ```
-docker run --net=back --rm dbolene/akkaclusterbin:1.0 $(docker inspect -f {{.Node.IP}} backend1) 25519 down akka.tcp://ClusterSystem@detailing:2555
+docker run --net=back --rm dbolene/akkaclusterbin:1.0 $(docker inspect -f {{.Node.IP}} carrepair) 25519 down akka.tcp://ClusterSystem@carrepair:2556
 
 docker stop detailing
 ```
@@ -229,7 +229,7 @@ docker rm -v $(docker ps -aq -f status=exited)
 Restart the CarRepairService node:
 
 ```
-docker run -d -p 2555:2555 -p 25559:9999 --name detailing --net=back bobwilsonsgaragedetailing:1.0 -Dbobwilsonsgarage.port=2555 -Dbobwilsonsgarage.hostname=detailing -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
+docker run -d -p 2556:2556 -p 25569:9999 --name carrepair --net=back bobwilsonsgaragecarrepair:1.0 -Dbobwilsonsgarage.port=2556 -Dbobwilsonsgarage.hostname=carrepai r-Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
 ```
 
 Try to POST again, rinse, repeat, experiment (like try just stopping the detailing container/service).
